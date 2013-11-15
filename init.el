@@ -26,7 +26,7 @@
  '(global-undo-tree-mode t))
 
 (add-hook 'python-mode-hook 'fci-mode)
-(color-theme-solarized-light)
+(color-theme-solarized-dark)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
