@@ -3,7 +3,7 @@
 ;; Copyright (C) 2009-2013  Free Software Foundation, Inc
 
 ;; Author: Toby Cubitt <toby-undo-tree@dr-qubit.org>
-;; Version: 20130812.1224
+;; Version: 20131119.144
 ;; X-Original-Version: 0.6.5
 ;; Keywords: convenience, files, undo, redo, history, tree
 ;; URL: http://www.dr-qubit.org/emacs.php
@@ -1202,6 +1202,42 @@ in visualizer."
     (define-key map "d" 'undo-tree-visualizer-selection-toggle-diff)
     ;; set keymap
     (setq undo-tree-visualizer-selection-mode-map map)))
+
+
+(defvar undo-tree-old-undo-menu-item nil)
+
+(defun undo-tree-update-menu-bar ()
+  "Update `undo-tree-mode' Edit menu items."
+  (if undo-tree-mode
+      (progn
+	;; save old undo menu item, and install undo/redo menu items
+	(setq undo-tree-old-undo-menu-item
+	      (cdr (assq 'undo (lookup-key global-map [menu-bar edit]))))
+	(define-key (lookup-key global-map [menu-bar edit])
+	  [undo] '(menu-item "Undo" undo-tree-undo
+			     :enable (and undo-tree-mode
+					  (not buffer-read-only)
+					  (not (eq t buffer-undo-list))
+					  (undo-tree-node-previous
+					   (undo-tree-current buffer-undo-tree)))
+			     :help "Undo last operation"))
+	(define-key-after (lookup-key global-map [menu-bar edit])
+	  [redo] '(menu-item "Redo" undo-tree-redo
+			     :enable (and undo-tree-mode
+					  (not buffer-read-only)
+					  (not (eq t buffer-undo-list))
+					  (undo-tree-node-next
+					   (undo-tree-current buffer-undo-tree)))
+			     :help "Redo last operation")
+	  'undo))
+    ;; uninstall undo/redo menu items
+    (define-key (lookup-key global-map [menu-bar edit])
+      [undo] undo-tree-old-undo-menu-item)
+    (define-key (lookup-key global-map [menu-bar edit])
+      [redo] nil)))
+
+(add-hook 'menu-bar-update-hook 'undo-tree-update-menu-bar)
+
 
 
 
